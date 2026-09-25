@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pila de Estudiantes</title>
+</head>
+<body>
+
+    <h1>Pila de Estudiantes</h1>
+
+    <h2>Agregar estudiante</h2>
+
+    <form id="formulario">
+
+        <label>Código:</label>
+        <input type="text" id="codigo" required>
+        <br><br>
+
+        <label>Nombres:</label>
+        <input type="text" id="nombres" required>
+        <br><br>
+
+        <label>Apellidos:</label>
+        <input type="text" id="apellidos" required>
+        <br><br>
+
+        <label>Email:</label>
+        <input type="email" id="email" required>
+        <br><br>
+
+        <label>Fecha de nacimiento:</label>
+        <input type="date" id="fechaNacimiento" required>
+        <br><br>
+
+        <label>Género:</label>
+        <select id="genero">
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+        </select>
+        <br><br>
+
+        <button type="submit">Agregar estudiante</button>
+
+    </form>
+
+    <hr>
+
+    <button onclick="mostrarPila()">Mostrar pila</button>
+
+    <button onclick="quitarEstudiante()">Quitar</button>
+
+    <button onclick="mostrarTamanyo()">Tamaño</button>
+
+    <p id="mensaje"></p>
+
+    <div id="resultado"></div>
+
+    <script>
+
+        document.getElementById("formulario").addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const estudiante = {
+
+                codigo: document.getElementById("codigo").value,
+
+                nombres: document.getElementById("nombres").value,
+
+                apellidos: document.getElementById("apellidos").value,
+
+                email: document.getElementById("email").value,
+
+                fechaNacimiento: document.getElementById("fechaNacimiento").value,
+
+                genero: document.getElementById("genero").value
+
+            };
+
+            const respuesta = await fetch("/api/pila/agregar", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(estudiante)
+
+            });
+
+            const mensaje = await respuesta.text();
+
+            document.getElementById("mensaje").innerText = mensaje;
+
+            document.getElementById("formulario").reset();
+
+        });
+
+
+        async function mostrarPila() {
+
+            const respuesta = await fetch("/api/pila/mostrar");
+
+            const estudiantes = await respuesta.json();
+
+            let html = "<h2>Estudiantes en la pila</h2>";
+
+            if (estudiantes.length === 0) {
+
+                html += "<p>La pila está vacía.</p>";
+
+            } else {
+
+                estudiantes.reverse();
+
+                estudiantes.forEach(function(estudiante) {
+
+                    html += `
+                        <div>
+                            <p>
+                                <strong>Código:</strong> ${estudiante.codigo}<br>
+                                <strong>Nombres:</strong> ${estudiante.nombres}<br>
+                                <strong>Apellidos:</strong> ${estudiante.apellidos}<br>
+                                <strong>Email:</strong> ${estudiante.email}<br>
+                                <strong>Fecha nacimiento:</strong> ${estudiante.fechaNacimiento}<br>
+                                <strong>Género:</strong> ${estudiante.genero}
+                            </p>
+                            <hr>
+                        </div>
+                    `;
+
+                });
+
+            }
+
+            document.getElementById("resultado").innerHTML = html;
+
+        }
+
+
+        async function quitarEstudiante() {
+
+            const respuesta = await fetch("/api/pila/quitar", {
+                method: "DELETE"
+            });
+
+            if (respuesta.status === 200) {
+
+                const estudiante = await respuesta.json();
+
+                if (estudiante) {
+
+                    document.getElementById("mensaje").innerText =
+                        "Se quitó: " + estudiante.nombres + " " + estudiante.apellidos;
+
+                } else {
+
+                    document.getElementById("mensaje").innerText =
+                        "La pila está vacía.";
+
+                }
+
+            }
+
+            mostrarPila();
+
+        }
+
+
+        async function mostrarTamanyo() {
+
+            const respuesta = await fetch("/api/pila/tamanyo");
+
+            const tamanyo = await respuesta.text();
+
+            document.getElementById("mensaje").innerText =
+                "Tamaño actual de la pila: " + tamanyo;
+
+        }
+
+    </script>
+
+</body>
+</html>
