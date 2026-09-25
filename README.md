@@ -52,7 +52,7 @@ Para ejecutar el proyecto se necesita:
 ## Clonar el proyecto
 
 
-git clone URL_DEL_REPOSITORIO
+git clone (https://github.com/sxmjkthv97/ActividadComplementaria_EDA311_HITO3_MorenoSamantha_pila.git)
 
 
 Ingresar a la carpeta:
